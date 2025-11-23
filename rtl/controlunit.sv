@@ -30,37 +30,58 @@ module controlunit #(
 
     always_comb begin 
         case(op)
-        7'd19, 7'd3: begin  //I-type 
-            case(funct3) 
-                3'b000, 3'b001:begin
-                    ImmSrc_o = 2'b10; //sign extend Instr[31:20] 
-                end
-                3'b100, 3'b101: begin
-                    ImmSrc_o = 2'b00; //zero extend Instr[31:20]
-                end
-            ImmSrc_o    =
-            ALUCtrl_o   =
-        end
+            7'd3: begin                                                     //I-type 
+                ALUCtrl_o = 4'b0;
+                case(funct3) 
+                    3'b000, 3'b001, 3'b010: begin
+                        ImmSrc_o = 2'b00;                                   //sign extend Instr[31:20] 
+                    end
+                    3'b100, 3'b101: begin
+                        ImmSrc_o = 2'b;                                     //zero extend Instr[31:20]
+                    end
+            end
 
-        7'd23, 7'd55: begin //U-type
-            ImmSrc_o    =
-            ALUCtrl_o   =
-        end
+            7'd19, 7'd51: begin                                             //Arithmetic I-type and R-type
+                ImmSrc_o = 2'b10;                                           //not sure if correct, should be sign extended
 
-        7'd35: begin        //S-type
-            ImmSrc_o    =
-            ALUCtrl_o   =
-        end
+                case(func3)
+                    3'b000: ALUCtrl_o = (funct7_5) ? 4'b0001 : 4'b0000;     //sub, add           
+                    3'b001: ALUCtrl_o = 4'b1000;                            //logical shift left                      
+                    3'b010: ALUCtrl_o = 4'b0101;                            //set less than signed                  
+                    3'b011: ALUCtrl_o = 4'b0110;                            //set less than unsigned   
+                    3'b100: ALUCtrl_o = 4'b0011;                            //xor
+                    3'b101: ALUCtrl_o = (funct7_5) ? 4'b1001 : 4'b0111;     //arithmetic shift right, logical shift right
+                    3'b110: ALUCtrl_o = 4'b0011;                            //or
+                    3'b111: ALUCtrl_o = 4'b0010;                            //and
+                        
+                  
 
-        7'd51: begin        //R-type
-            ImmSrc_o    =
-            ALUCtrl_o   =
-        end
+            end
 
-        7'd99: begin        //B-type
-            ImmSrc_o    =
-            ALUCtrl_o   =
-        end
+            //7'd23, 7'd55: begin //U-type
+            //    ImmSrc_o    =
+            //    ALUCtrl_o   =
+            //end
+
+            7'd35: begin                //S-type
+                ImmSrc_o    = 2'b01;
+                ALUCtrl_o   = 4'b0000;
+            end
+
+            7'd99: begin                //B-type
+                ImmSrc_o    = 2'b10;
+                ALUCtrl_o   = 4'b0000;  //doesnt matter
+            end
+
+            7'd103: begin
+                ImmSrc_o = 2'b00;
+                ALUCtrl_o = 4'b1011;    //need a new ALU instruction
+            end
+            7'd111: begin
+                ImmSrc_o = 
+                ALUCtrl_o = 4'b0000;    //need new ALU instruct
+            end
+
     end
 
     always_comb begin
