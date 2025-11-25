@@ -5,19 +5,15 @@ module fetch #(
     input logic clk,
     input logic rst,
     input logic [DATA_WIDTH-1:0] PCTargetE_i, //this is the jump PC value coming after Execute
+
     output logic [DATA_WIDTH-1:0] PC_Plus4_F, //this is the next instruction 
     output logic [DATA_WIDTH-1:0] PC_F, //this goes to execute where it is added to the Immediate for JMP
     output logic [DATA_WIDTH-1:0] Instr_o, //this goes into control unit and EXT
-   
 
     //this goes into REGFILE
     output logic [4:0] A1_o,
     output logic [4:0] A2_o,
     output logic [4:0] A3_o
-
-  
-
-
 );
 
 logic [DATA_WIDTH-1:0]  PC;
@@ -33,8 +29,6 @@ pc_module #(
         .PC(PC),
         .PC_Plus4(PC_Plus4_F)
     );
-
-
 
 instrmem instruction_memory (
     .A_i(PC),

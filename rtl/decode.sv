@@ -10,7 +10,6 @@ module decode #(
 
     input logic clk,
 
-
     //Register File inputs 
     input logic [4:0] A1_i,
     input logic [4:0] A2_i,
@@ -19,7 +18,6 @@ module decode #(
     input logic [DATA_WIDTH-1:0] WD3_i,
     input logic WE3_i,
 
-    
     //RF outputs
     output logic [DATA_WIDTH-1:0] RD1_o,
     output logic [DATA_WIDTH-1:0] RD2_o,
@@ -31,18 +29,10 @@ module decode #(
     output logic [DATA_WIDTH-1:0] PC_Plus4D_o, //this is the next instruction 
     output logic [DATA_WIDTH-1:0] PCD_o, //this goes to execute where it is added to the Immediate for JMP
     
-
     //test output 
-    output logic [DATA_WIDTH-1:0] a0_o,
-    
-
-
-
-  
-
+    output logic [DATA_WIDTH-1:0] a0_o
 
 );
-
 
     extend extend(
         .instr_i(instr_i),
