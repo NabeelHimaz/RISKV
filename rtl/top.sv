@@ -6,118 +6,129 @@ module top #(
     output logic [DATA_WIDTH-1:0]   a0
 );
 
-    // Program counter and instruction
-    logic [DATA_WIDTH-1:0] PC;
-    logic [DATA_WIDTH-1:0] instr;
+//wires for outputs are declared before each module
+logic           RegWrite;
+logic [3:0]     ALUCtrl;
+logic           ALUSrc;
+logic [2:0]     ImmSrc;
+logic           PCSrc;
+logic           MemWrite;
+logic [1:0]     ResultSrc;
+logic [1:0]     MemType;
+logic           MemSign;
 
-    // Immediate after sign/zero extension
-    logic [DATA_WIDTH-1:0] ImmExt;
+controlunit controlunit (
+    .Instr_i(Instr),
+    .Zero_i(Zero),         
 
-    // Register file signals
-    logic [4:0] rs1, rs2, rd;
-    logic [DATA_WIDTH-1:0] rdData;     // data written to regfile (from ALU / memory)
-    logic [DATA_WIDTH-1:0] reg_rdata1; // RD1_o
-    logic [DATA_WIDTH-1:0] reg_rdata2; // RD2_o
+    .RegWrite_o(RegWrite),
+    .ALUCtrl_o(ALUCtrl),     
+    .ALUSrc_o(ALUSrc),
+    .ImmSrc_o(ImmSrc),       
+    .PCSrc_o(PCSrc),
+    .MemWrite_o(MemWrite),    
+    .ResultSrc_o(ResultSrc)
+    .MemSign_o(MemSign),
+    .MemType_o(MemType)
+);
 
-    // ALU signals
-    logic [DATA_WIDTH-1:0] ALUop1;
-    logic [DATA_WIDTH-1:0] ALUop2;
-    logic [DATA_WIDTH-1:0] ALUout;
+logic [4:0] A1;
+logic [4:0] A2;
+logic [4:0] A3;
+logic [DATA_WIDTH-1:0] PCPlus4F;
+logic [DATA_WIDTH-1:0] PCF;
+logic [DATA_WIDTH-1:0] Instr;
 
-    // Control signals (sizes match controlunit.sv)
-    logic                    RegWrite;
-    logic [3:0]              ALUCtrl;
-    logic                    ALUSrc;
-    logic [2:0]              ImmSrc;
-    logic                    PCSrc;
-    logic                    MemWrite;
-    logic [1:0]              ResultSrc;
+fetch fetch(
+    .PCSrc_i(PCSrc),
+    .clk(clk),
+    .rst(rst),
+    .PCTargetE_i(PCTargetE),
 
-    // Zero flag for branches (controlunit expects Zero_i)
-    logic Zero;
+    .PC_Plus4_F(PCPlus4F),
+    .PC_F(PCF),
+    .Instr_o(Instr),
+    .A1_o(A1),
+    .A2_o(A2),
+    .A3_o(A3)
+);
 
-    // pc module
-    pc_module #(
-        .DATA_WIDTH(DATA_WIDTH)
-    ) pc (
-        .clk(clk),
-        .rst(rst),
-        .PCsrc(PCSrc),
-        .ImmExt_o(ImmExt),
+logic [DATA_WIDTH-1:0] PCPlus4D;
+logic [DATA_WIDTH-1:0] PCD;
+logic [DATA_WIDTH-1:0] RD1;
+logic [DATA_WIDTH-1:0] RD2;
+logic [DATA_WIDTH-1:0] ImmExt;
 
-        .PC(PC)
-    );
+decode decode(
+    .ImmSrc_i(ImmSrc),
+    .PC_Plus4_F_i(PCPlus4F),
+    .PC_F_i(PCF),
+    .clk(clk),
+    .A1_i(A1),
+    .A2_i(A2),
+    .A3_i(A3),
+    .instr_i(Instr),
+    .WD3_i(ResultW),
+    .WE3_i(RegWrite),
 
-    // instruction memory (assumed interface: A -> address, RD -> instruction)
-    instrmem instrmem (
-        .A(PC),
-        .RD(instr)
-    );
+    .RD1_o(RD1),
+    .RD2_o(RD2),
+    .ImmExtD_o(ImmExt),
+    .PC_Plus4D_o(PCPlus4D),
+    .PCD_o(PCD), 
+    .a0_o(a0)
+);
 
-    // sign/zero extender
-    extend extend_u (
-        .instr_i(instr),
-        .ImmSrc_i(ImmSrc),
-        .immop_o(immOp)
-    );
+logic [DATA_WIDTH-1:0] PCPlus4E;
+logic [DATA_WIDTH-1:0] ALUResult;
+logic [DATA_WIDTH-1:0] WriteData;
+logic [DATA_WIDTH-1:0] PCTargetE;
+logic Zero;
 
-    // control unit
-    controlunit control_u (
-        .Instr_i(instr),
-        .Zero_i(Zero),
+execute execute(
+    .RD1E_i(RD1),
+    .RD2E_i(RD2),
+    .PCE_i(PCD),
+    .ImmExtE_i(ImmExt),
+    .PCPlus4E_i(PCPlus4D),
+    .ALUCtrl_i(ALUCtrl),
+    .ALUSrc_i(ALUSrc),
 
-        .RegWrite_o(RegWrite),
-        .ALUCtrl_o(ALUCtrl),
-        .ALUSrc_o(ALUSrc),
-        .ImmSrc_o(ImmSrc),
-        .PCSrc_o(PCSrc),
-        .MemWrite_o(MemWrite),
-        .ResultSrc_o(ResultSrc)
-    );
+    .ALUResultE_o(ALUResult),
+    .WriteDataE_o(WriteData),
+    .PCPlus4E_o(PCPlus4E),
+    .PCTargetE_o(PCTargetE),
+    .Zero_o(Zero)
+);
 
-    // register address extraction (common R/I/S/B formats)
-    always_comb begin
-        rs1 = instr[19:15];
-        rs2 = instr[24:20];
-        rd  = instr[11:7];
-    end
+logic [DATA_WIDTH-1:0] PCPlus4M;
+logic [DATA_WIDTH-1:0] ALUResultM;
+logic [DATA_WIDTH-1:0] RDM;
 
-    // regfile instantiation (ports from regfile.sv)
-    regfile regfile_u (
-        .clk(clk),
-        .AD1_i(rs1),
-        .AD2_i(rs2),
-        .AD3_i(rd),
-        .WE3_i(RegWrite),
-        .WD3_i(ALUout),
 
-        .RD1_o(ALUop1),
-        .RD2_o(reg_rdata2),
-        .a0_o(a0)
-    );
+memoryblock memory(
+    .ALUResultM_i(ALUResult),
+    .WriteDataM_i(WriteData),
+    .PCPlus4M_i(PCPlus4E),
+    .MemWrite_i(MemWrite),
+    .clk(clk),
+    .MemSign_i(MemSign),
+    .MemType_i(MemType),
 
-    // choose between register second operand and immediate
-    mux #(
-        .DATA_WIDTH(DATA_WIDTH)
-    ) mux_alu_src (
-        .in0(reg_rdata2),
-        .in1(immOp),
-        .sel(ALUSrc),
-        .out(ALUop2)
-    );
+    .ALUResultM_o(ALUResultM),
+    .RD_o(RDM),
+    .PCPlus4M_o(PCPlus4M)
+);
 
-    // ALU (ports from ALU.sv)
-    ALU alu_u (
-        .srcA_i(ALUop1),
-        .srcB_i(ALUop2),
-        .ALUCtrl_i(ALUCtrl),
+logic [DATA_WIDTH-1:0] ResultW;
 
-        .ALUResult_o(ALUout)
-    );
+writeback writeback(
+    .ALUResultM_i(ALUResultM),
+    .ReadDataW_i(RDM),
+    .PCPlus4W_i(PCPlus4M),
+    .ResultSrc_i(ResultSrc),
 
-    // Zero flag used by control unit (BEQ uses equality check)
-    always_comb begin
-        Zero = (ALUout == {DATA_WIDTH{1'b0}});
-    end
+    .ResultW_o(ResultW)
+);
 
 endmodule

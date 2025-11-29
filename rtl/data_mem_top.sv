@@ -35,7 +35,8 @@ data_mem data_mem(
     .read_data_o(Read_Data)
 );
 
-data_mem data_mem_o(
+//typo fix on line below
+data_mem_o data_mem_o(
     .mem_type_i(mem_type_i),
     .mem_sign_i(mem_sign_i),
     .addr_i(addr_i_i),
