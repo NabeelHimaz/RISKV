@@ -16,6 +16,7 @@ logic           MemWrite;
 logic [1:0]     ResultSrc;
 logic [1:0]     MemType;
 logic           MemSign;
+logic           J;
 
 controlunit controlunit (
     .Instr_i(Instr),
@@ -29,7 +30,8 @@ controlunit controlunit (
     .MemWrite_o(MemWrite),    
     .ResultSrc_o(ResultSrc)
     .MemSign_o(MemSign),
-    .MemType_o(MemType)
+    .MemType_o(MemType),
+    .J_o(J)
 );
 
 logic [4:0] A1;
@@ -93,6 +95,7 @@ execute execute(
     .PCPlus4E_i(PCPlus4D),
     .ALUCtrl_i(ALUCtrl),
     .ALUSrc_i(ALUSrc),
+    .JumpCtrl_i(J),
 
     .ALUResultE_o(ALUResult),
     .WriteDataE_o(WriteData),
