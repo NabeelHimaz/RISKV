@@ -7,45 +7,46 @@ module top #(
     output logic [DATA_WIDTH-1:0]   a0
 );
 
-    // --- control signals ---
-    logic           RegWrite;
-    logic [3:0]     ALUCtrl;
-    logic           ALUSrc;
-    logic [2:0]     ImmSrc;
-    logic           PCSrc;
-    logic           MemWrite;
-    logic [1:0]     ResultSrc;
+//wires for outputs are declared before each module
+logic           RegWrite;
+logic [3:0]     ALUCtrl;
+logic           ALUSrc;
+logic [2:0]     ImmSrc;
+logic           PCSrc;
+logic           MemWrite;
+logic [1:0]     ResultSrc;
+logic [1:0]     MemType;
+logic           MemSign;
+logic           J;
 
-    // --- fetch outputs ---
-    logic [DATA_WIDTH-1:0] PCPlus4F;
-    logic [DATA_WIDTH-1:0] PCF;
-    logic [DATA_WIDTH-1:0] Instr;
-    logic [4:0]           A1;
-    logic [4:0]           A2;
-    logic [4:0]           A3_from_fetch; // kept for visibility but not driven into decode
+controlunit controlunit (
+    .Instr_i(Instr),
+    .Zero_i(Zero),         
 
-    // control unit
-    controlunit controlunit (
-        .Instr_i(Instr),
-        .Zero_i(Zero),
+    .RegWrite_o(RegWrite),
+    .ALUCtrl_o(ALUCtrl),     
+    .ALUSrc_o(ALUSrc),
+    .ImmSrc_o(ImmSrc),       
+    .PCSrc_o(PCSrc),
+    .MemWrite_o(MemWrite),    
+    .ResultSrc_o(ResultSrc)
+    .MemSign_o(MemSign),
+    .MemType_o(MemType),
+    .J_o(J)
+);
 
-        .RegWrite_o(RegWrite),
-        .ALUCtrl_o(ALUCtrl),
-        .ALUSrc_o(ALUSrc),
-        .ImmSrc_o(ImmSrc),
-        .PCSrc_o(PCSrc),
-        .MemWrite_o(MemWrite),
-        .ResultSrc_o(ResultSrc)
-    );
+logic [4:0] A1;
+logic [4:0] A2;
+logic [4:0] A3;
+logic [DATA_WIDTH-1:0] PCPlus4F;
+logic [DATA_WIDTH-1:0] PCF;
+logic [DATA_WIDTH-1:0] Instr;
 
-    // fetch
-    fetch #(
-        .DATA_WIDTH(DATA_WIDTH)
-    ) fetch_u (
-        .PCSrc_i(PCSrc),
-        .clk(clk),
-        .rst(rst),
-        .PCTargetE_i(PCTargetE),
+fetch fetch(
+    .PCSrc_i(PCSrc),
+    .clk(clk),
+    .rst(rst),
+    .PCTargetE_i(PCTargetE),
 
         .PC_Plus4_F(PCPlus4F),
         .PC_F(PCF),
@@ -99,16 +100,15 @@ module top #(
     logic                 Zero;
     logic                 JumpCtrl;
 
-    execute execute_u (
-        .RD1E_i(RD1),
-        .RD2E_i(RD2),
-        .PCE_i(PCD),
-        .ImmExtE_i(ImmExt),
-        .PCPlus4E_i(PCPlus4D),
-        .ALUCtrl_i(ALUCtrl),
-        .ALUSrc_i(ALUSrc),
-        .JumpCtrl_i(JumpCtrl),
-        .RdD_i(RdD),
+execute execute(
+    .RD1E_i(RD1),
+    .RD2E_i(RD2),
+    .PCE_i(PCD),
+    .ImmExtE_i(ImmExt),
+    .PCPlus4E_i(PCPlus4D),
+    .ALUCtrl_i(ALUCtrl),
+    .ALUSrc_i(ALUSrc),
+    .JumpCtrl_i(J),
 
         .ALUResultE_o(ALUResultE),
         .WriteDataE_o(WriteDataE),
