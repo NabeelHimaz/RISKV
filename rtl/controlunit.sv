@@ -2,7 +2,7 @@ module controlunit #(
     parameter DATA_WIDTH = 32
 ) (
     input  logic [DATA_WIDTH-1:0]   Instr_i,
-    input  logic                    Zero_i,         //only needed for beq instructions NH & AT: where is this being driven from?
+    input  logic                    branchTaken_i,  //input from ALU
 
     output logic                    RegWrite_o,
     output logic [3:0]              ALUCtrl_o,      //determined using func3 and the 5th bits of op and funct7
@@ -127,7 +127,7 @@ module controlunit #(
         MemWrite_o      = (op == 7'd35) ? 1'b1 : 1'b0;
         RegWrite_o      = (op == 7'd35 || op == 7'd99) ? 1'b0 : 1'b1; 
         ALUSrcB_o       = (op == 7'd51) ? 1'b0 : 1'b1;
-        PCSrc_o         = (op == 7'd103 || op == 7'd111 || (op == 7'd99 && Zero_i)) ? 1'b1 : 1'b0; //NH & AT: this is relying on a zero flag that I don't think is being properly driven rn?
+        PCSrc_o         = (op == 7'd103 || op == 7'd111 || (op == 7'd99 && branchTaken_i)) ? 1'b1 : 1'b0; 
         JumpSrc_o       = (op == 7'd111 || op == 7'd103) ? 1'b1 : 1'b0;
         ALUSrcA_o       = (op == 7'd23) ? 1'b1 : 1'b0;
 

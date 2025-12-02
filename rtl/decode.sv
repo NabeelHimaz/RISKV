@@ -13,7 +13,7 @@ module decode #(
     //Register File inputs 
     input logic [4:0] A1_i,
     input logic [4:0] A2_i,
-    input logic [4:0] RdW_o,
+    input logic [4:0] RdW_i,
     input logic [DATA_WIDTH-1:0] instr_i,
     input logic [DATA_WIDTH-1:0] WD3_i,
     input logic WE3_i,
