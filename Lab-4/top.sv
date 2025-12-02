@@ -26,7 +26,6 @@ module top #(
 
     instrmem instrmem(
         .A(PC),
-
         .RD(instr)
     );
 

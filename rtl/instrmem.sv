@@ -1,9 +1,10 @@
-module instru_mem#(    
+module instrmem#(    
+
     parameter ADDR_WIDTH = 32,
     parameter DATA_WIDTH = 8,
 )(
-    input logic  [ADDR_WIDTH-1:0] addr_i,
-    output logic [DATA_WIDTH-1:0] data_o,
+    input logic  [ADDR_WIDTH-1:0] A_i,
+    output logic [ADDR_WIDTH-1:0] RD_o,
 );
 
 logic [DATA_WIDTH-1:0] rom_mem [32'hBFC00FFF : 32'hBFC00000];
