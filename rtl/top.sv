@@ -216,7 +216,8 @@ writeback writeback(
     .PCPlus4W_i(PCPlus4W),
     .ResultSrc_i(ResultSrcW),
 
-    .ResultW_o(ResultW)
+    .ResultW_o(ResultW),
+    .RdW_o(RdW)
 );
 
 endmodule
