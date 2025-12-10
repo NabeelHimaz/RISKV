@@ -65,7 +65,7 @@ module execute #(
         endcase
     end
 
-    logic [DATA_WIDTH-1:0]  SrcBE;
+    //logic [DATA_WIDTH-1:0]  SrcBE; don't need anymore because we're pipelining
     //mux for srcBE based on hazard unit 
     always_comb begin
         case(ForwardBEctrl_i)
