@@ -47,7 +47,8 @@ logic jalrStall;
 always_comb begin
     lwStall = (ResultSrcE_i && ((Rs1D_i == RdE_i) || (Rs2D_i == RdE_i)));  
     jalrStall = (op == 7'b1100111) && (((Rs1D_i == RdE_i) && ResultSrcE_i) || ((Rs1D_i == RdM_i) && RegWriteM_i)); 
-    StallF_o = StallD_o = (lwStall || jalrStall);
+    StallF_o = (lwStall || jalrStall);
+    StallD_o = (lwStall || jalrStall);
     FlushD_o = PCSrcE_i; //flush when branch is taken or load introduces a bubble
     FlushE_o = (lwStall || jalrStall || PCSrcE_i);
 end

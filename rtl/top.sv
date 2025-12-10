@@ -3,21 +3,24 @@ module top #(
 ) (
     input  logic                    clk,
     input  logic                    rst,
+    input  logic                    trigger, // Added missing testbench signal
     output logic [DATA_WIDTH-1:0]   a0
 );
 
 // Fetch Stage Signals
 logic [DATA_WIDTH-1:0] PCPlus4F, PCF, InstrF;
-logic                  PCSrcE; // Feedback from Execute
+logic                  PCSrcE; 
 
 // Decode Stage Signals
 logic [DATA_WIDTH-1:0] InstrD, PCD, PCPlus4D;
 logic [DATA_WIDTH-1:0] RD1D, RD2D, ImmExtD;
-logic [4:0]            A1D, A2D, A3D, RDD, RdD;
+logic [4:0]            A1D, A2D, RDD, RdD;
 logic [DATA_WIDTH-1:0] a0_internal;
 
 // Control Signals (Decode)
 logic       RegWriteD, MemWriteD, ALUSrcD, MemSignD, JumpD, BranchD;
+logic       JumpSrcD; 
+logic [2:0] BranchCtrlD; 
 logic [1:0] ResultSrcD, MemTypeD;
 logic [3:0] ALUCtrlD;
 logic [2:0] ImmSrcD;
@@ -26,7 +29,7 @@ logic [2:0] ImmSrcD;
 logic [DATA_WIDTH-1:0] RD1E, RD2E, PCE, ImmExtE, PCPlus4E;
 logic [4:0]            RDE, RdE_out, Rs1E_out, Rs2E_out;
 logic [DATA_WIDTH-1:0] ALUResultE, WriteDataE, PCTargetE;
-logic                  ZeroE, BranchTakenE;
+logic                  BranchTakenE; // Kept but marked unused below
 
 // Control Signals (Execute)
 logic       RegWriteE, MemWriteE, ALUSrcE, MemSignE, JumpE, BranchE;
@@ -54,9 +57,23 @@ logic [1:0] ResultSrcW;
 logic       StallF, StallD, FlushD, FlushE;
 logic [1:0] ForwardAE, ForwardBE;
 
+// Dummy signals for unused outputs
+logic [4:0]            unused_RdM_o, unused_RdW_o;
+logic [DATA_WIDTH-1:0] unused_pcplus4_d, unused_pc_d, unused_pcplus4_e;
+logic [4:0]            unused_A1, unused_A2, unused_A3;
+
+// Suppress unused signal warnings for specific wires
+logic [2:0] unused_BranchCtrlD;
+logic       unused_JumpSrcD;
+logic       unused_BranchTakenE;
+logic       unused_trigger;
+assign unused_BranchCtrlD = BranchCtrlD;
+assign unused_JumpSrcD = JumpSrcD;
+assign unused_BranchTakenE = BranchTakenE;
+assign unused_trigger = trigger;
+
 
 /////////////////// Fetch Stage //////////////////////
-logic [4:0] unused_A1, unused_A2, unused_A3;
 
 fetch fetch(
     .PCSrc_i(PCSrcE),
@@ -80,31 +97,28 @@ pipereg_FD_1 #(DATA_WIDTH) fd_reg (
 
 
 ///////////////// Decode Stage /////////////////
-logic ctrl_PCSrc_unused; 
 
 controlunit controlunit (
     .Instr_i(InstrD),
-    .Zero_i(1'b0),          
-
     .RegWrite_o(RegWriteD),
     .ALUCtrl_o(ALUCtrlD),     
     .ALUSrc_o(ALUSrcD),
     .ImmSrc_o(ImmSrcD),       
-    .PCSrc_o(ctrl_PCSrc_unused), 
     .MemWrite_o(MemWriteD),    
     .ResultSrc_o(ResultSrcD),
     .MemSign_o(MemSignD),
-    .MemType_o(MemTypeD)
+    .MemType_o(MemTypeD),
+    
+    .JumpSrc_o(JumpSrcD),
+    .Branch_o(BranchCtrlD),
+    .BranchInstr_o(BranchD)
 );
 
 // Local Decode Logic
-assign BranchD = (InstrD[6:0] == 7'd99);
 assign JumpD   = (InstrD[6:0] == 7'd111 || InstrD[6:0] == 7'd103);
 assign A1D     = InstrD[19:15];
 assign A2D     = InstrD[24:20];
 assign RDD     = InstrD[11:7];
-
-logic [DATA_WIDTH-1:0] pcplus4_dummy_d, pc_dummy_d;
 
 decode decode(
     .ImmSrc_i(ImmSrcD),
@@ -122,8 +136,9 @@ decode decode(
     .RD1_o(RD1D),
     .RD2_o(RD2D),
     .ImmExtD_o(ImmExtD),
-    .PC_Plus4D_o(pcplus4_dummy_d),
-    .PCD_o(pc_dummy_d), 
+    // CHECK -> Connected to dummy wires
+    .PC_Plus4D_o(unused_pcplus4_d),
+    .PCD_o(unused_pc_d), 
     .a0_o(a0_internal),
     .RdD_o(RdD)
 );
@@ -154,8 +169,7 @@ hazardunit hazard_unit (
     // From Decode
     .Rs1D_i(A1D),
     .Rs2D_i(A2D),
-    .Instr_i(InstrD), //this isn't on schematic 
-    
+    .Instr_i(InstrD),
     // From Execute
     .Rs1E_i(Rs1E_out),
     .Rs2E_i(Rs2E_out),
@@ -181,7 +195,6 @@ hazardunit hazard_unit (
 );
 
 ////////////////////// Exectute Stage ////////////////////
-logic [DATA_WIDTH-1:0] pcplus4_dummy_e;
 
 execute execute(
     .RD1E_i(RD1E),
@@ -190,13 +203,14 @@ execute execute(
     .ImmExtE_i(ImmExtE),
     .PCPlus4E_i(PCPlus4E),
     .RdD_i(RDE),
-    .BranchSrc_i({1'b0, BranchE}),
+    // ADDED PADDING -> CHECK WHAT'S GOING ON HERE
+    .BranchSrc_i({2'b00, BranchE}), 
     .Rs1D_i(A1D),
     .Rs2D_i(A2D),
     .ResultW_i(ResultW),
     .ALUResultM_i(ALUResultM),
     
-    // Control inputs (pipelined from decode)
+    // Control inputs
     .RegWriteE_i(RegWriteE),
     .ResultSrcE_i(ResultSrcE),
     .MemWriteE_i(MemWriteE),
@@ -214,7 +228,8 @@ execute execute(
     .Rs2E_o(Rs2E_out),
     .ALUResultE_o(ALUResultE),
     .WriteDataE_o(WriteDataE),
-    .PCPlus4E_o(pcplus4_dummy_e),
+    // Connected dummy
+    .PCPlus4E_o(unused_pcplus4_e),
     .RdE_o(RdE_out),
     .branchTaken_o(BranchTakenE),
     .PCTargetE_o(PCTargetE),
@@ -249,6 +264,9 @@ memoryblock memory(
     .clk(clk),
     .MemSign_i(MemSignM),
     .MemType_i(MemTypeM),
+    
+    .RdE_i(RDM), 
+    .RdM_o(unused_RdM_o),        
 
     .ALUResultM_o(ALUResultW_internal), 
     .RD_o(ReadDataM),
@@ -277,6 +295,8 @@ writeback writeback(
     .PCPlus4W_i(PCPlus4W),
     .ResultSrc_i(ResultSrcW),
     .RdM_i(RDW),
+    // Connected Dummy
+    .RdW_o(unused_RdW_o),
 
     .ResultW_o(ResultW)
 );
