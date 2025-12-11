@@ -110,7 +110,7 @@ The single-cycle implementation forms the foundation of our RISC-V processor, ex
 
 ### Architecture Diagram
 
-![Single-Cycle Architecture Diagram](./images/single-cycle-diagram.png)
+![Single-Cycle Architecture Diagram](./images/singlecycleschematic.jpg)
 
 *[Insert single-cycle architecture diagram here]*
 
