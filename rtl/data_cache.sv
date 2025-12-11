@@ -35,8 +35,9 @@ module data_cache #(
     logic [8:0]             set_index;
     logic [TAG_WIDTH-1:0]   tag;
 
-    assign set_index = addr_i[10:2];
-    assign tag       = addr_i[31:11];
+    assign set_index   = addr_i[10:2];
+    assign tag         = addr_i[31:11];
+    assign unused_bits = addr_i[1:0]; // removes error
 
     logic hit0, hit1;
 
@@ -66,8 +67,9 @@ module data_cache #(
                 valid_array_0[i] = 1'b0;   // Use = not <=
                 valid_array_1[i] = 1'b0;   // Use = not <=
                 lru_array[i]     = 1'b0;   // Use = not <=
-end
-        end else begin
+                end
+        end 
+        else begin
             
             // Handle Writes (Write-Through)
             if (write_en_i) begin

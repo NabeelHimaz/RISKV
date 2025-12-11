@@ -11,6 +11,7 @@ module data_mem_i #(
 logic [1:0] byte_offset;
 
 assign byte_offset = addr_i[1:0];
+assign unused_bits = addr_i[31:2]; // removes error
 
 always_comb begin
     case (mem_type_i)

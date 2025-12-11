@@ -14,6 +14,7 @@ module data_mem_o #(
 logic [1:0] logic_byte_i;
 
 assign logic_byte_i = addr_i[1:0];
+assign unused_bits = addr_i[31:2]; // removes error
 
 always_comb begin
     case (mem_type_i)

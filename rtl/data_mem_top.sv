@@ -22,6 +22,7 @@ module data_mem_top #(
     logic                  cache_hit; // Use for debugging
 
     assign addr_aligned = {addr_i[31:2], {2'b00}};
+    assign unused_bits = addr_i[31:17]; // removes error
 
     // Format Write Data (Store Byte/Halfword logic)
     data_mem_i data_mem_i (

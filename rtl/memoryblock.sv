@@ -23,6 +23,7 @@ data_mem_top datamem(
     .mem_sign_i(MemSign_i), //control signal?
     .write_data_i(WriteDataM_i),
     .addr_i(ALUResultM_i),
+    .rst_i()
 
     .read_data_o(RD_o)
 
