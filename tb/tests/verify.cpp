@@ -50,6 +50,30 @@ TEST_F(CpuTestbench, TestPdf)
     EXPECT_EQ(top_->a0, 15363);
 }
 
+TEST_F(CpuTestbench, TestHazard)
+{
+    setupTest("8_hazard");
+    initSimulation();
+    runSimulation(CYCLES);
+    EXPECT_EQ(top_->a0, 100);
+}
+
+TEST_F(CpuTestbench, TestControlHazard)
+{
+    setupTest("7_control_hazard");
+    initSimulation();
+    runSimulation(CYCLES);
+    EXPECT_EQ(top_->a0, 0);
+}
+
+TEST_F(CpuTestbench, TestAllInstructions)
+{
+    setupTest("6_all_instructions");
+    initSimulation();
+    runSimulation(CYCLES);
+    EXPECT_EQ(top_->a0, 1024);
+}
+
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
