@@ -358,24 +358,31 @@ These techniques ensure efficient data access, reducing latency and leveraging l
 ```
 ## Implementation
 The two-way set-associative cache design consists of the following components:
-1. Cache Controller:
-    - Manages cache operations such as hits, misses, evictions, and updates.
-    - Tracks the valid bits, dirty bits, and tags for each block in a set.
-    - Uses an LRU (Least Recently Used) bit to determine which block to evict on a miss.
-    - Handles read and write operations:
-        - On a cache hit, data is retrieved or updated directly in the cache.
-        - On a cache miss, the controller fetches the data from RAM, updates the cache, and potentially writes back evicted data if dirty.
-2. Top Module (For cache):
-    - Instantiates the cache controller and connects it to the SRAM.
-    - Extracts the set index, tag, and byte offset from the input address.
-    - Handles interactions between the cache controller and the SRAM, ensuring consistency between cache and main memory.
-3. **Cache Structure**:
-    - Each set contains:
-        - Two data blocks with corresponding valid, dirty, and tag bits.
-        - An LRU bit to track usage.
-    - Designed to store 32-bit data across 512 sets (1024 words in total).
 
-This implementation efficiently handles data locality with low-latency access on hits and ensures correctness during evictions using write-back and read-through policies.
+1. **Cache Controller**:
+    - **Associativity**: 2-Way Set Associative.
+    - **Addressing**: 512 Sets (indexed by address bits `[10:2]`) with 21-bit Tags (address bits `[31:11]`).
+    - **Replacement Policy**: **LRU (Least Recently Used)**. A single bit per set tracks which way was accessed last to determine the victim on eviction.
+    - **Write Policy**: **Write-Through, Write-No-Allocate**.
+        - **Write Hit**: Data is updated in the cache and simultaneously written to main memory to ensure consistency.
+        - **Write Miss**: Data is written directly to main memory without allocating a line in the cache.
+    - **Read Policy**:
+        - **Read Miss**: Data is fetched from main memory and allocated into the cache, evicting the Least Recently Used block if the set is full.
+
+2. **Top Module (Memory Subsystem)**:
+    - Acts as the interface between the CPU pipeline and the memory hierarchy.
+    - Integrates the `data_cache` with the main `data_mem` RAM.
+    - **Data Alignment**: Instantiates `data_mem_i` and `data_mem_o` to handle sub-word operations (`LB`, `LH`, `SB`, `SH`). Byte manipulation happens *before* the cache for stores and *after* the cache for loads, allowing the cache to store full aligned 32-bit words.
+
+3. **Cache Structure**:
+    - **Storage Arrays**:
+        - `data_array`: Stores 32-bit data words.
+        - `tag_array`: Stores 21-bit address tags.
+        - `valid_array`: Tracks if a cache line contains valid data.
+        - `lru_array`: Stores replacement state.
+    - **Capacity**: 512 sets × 2 ways × 4 bytes = 4 KB of fast-access storage.
+
+This implementation reduces average memory access time while maintaining simplified coherency through the Write-Through policy, avoiding the complexity of Dirty bits and Write-Back buffers.
 
 ## Testing
 
@@ -402,7 +409,7 @@ Pipelining is incorporated to improve throughput by enabling the concurrent exec
 The design ensures that each component, including the cache and pipeline, operates cohesively for optimal performance. This integration results in a high-performance RISC-V processor capable of handling complex tasks efficiently.
 
 ## Schematic
-![RISC-V 32I Pipelined + Cache implementation](images/Complete.png)
+![RISC-V 32I Pipelined + Cache implementation](images/Pipelined_schematic.jpeg)
 
 ## Contributions
 
