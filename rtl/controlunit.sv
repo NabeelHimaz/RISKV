@@ -21,11 +21,13 @@ module controlunit #(
 
     logic [6:0]     op;
     logic           funct7_5;
+    logic           funct7_0; // detect M-extension
     logic [2:0]     funct3;
 
     assign op =     Instr_i[6:0];
     assign funct3 =  Instr_i[14:12];
     assign funct7_5 = Instr_i[30];
+    assign funct7_0 = Instr_i[25]; // Bit 0 of funct7
 
     always_comb begin 
         // Default values
@@ -83,14 +85,18 @@ module controlunit #(
 
             7'd51: begin // R-type ALU
                 case(funct3)
-                    3'b000: ALUCtrl_o = (funct7_5) ? 4'b0001 : 4'b0000; // SUB, ADD
-                    3'b001: ALUCtrl_o = 4'b1000;                            //logical shift left
-                    3'b010: ALUCtrl_o = 4'b0101;                            //set less than signed                  
-                    3'b011: ALUCtrl_o = 4'b0110;                            //set less than unsigned   
-                    3'b100: ALUCtrl_o = 4'b0100;                            //xor
-                    3'b101: ALUCtrl_o = (funct7_5) ? 4'b1001 : 4'b0111;     //arithmetic shift right, logical shift right
-                    3'b110: ALUCtrl_o = 4'b0011;                            //or
-                    3'b111: ALUCtrl_o = 4'b0010;                            //and
+                    3'b000: begin
+                        if (funct7_0) ALUCtrl_o = 4'b1010; // MUL (M-extension)
+                        else ALUCtrl_o = (funct7_5) ? 4'b0001 : 4'b0000; // SUB, ADD
+                    end
+
+                    3'b001: ALUCtrl_o = 4'b1000;                        // SLL
+                    3'b010: ALUCtrl_o = 4'b0101;                        // SLT
+                    3'b011: ALUCtrl_o = 4'b0110;                        // SLTU
+                    3'b100: ALUCtrl_o = 4'b0100;                        // XOR
+                    3'b101: ALUCtrl_o = (funct7_5) ? 4'b1001 : 4'b0111; // SRA, SRL
+                    3'b110: ALUCtrl_o = 4'b0011;                        // OR
+                    3'b111: ALUCtrl_o = 4'b0010;                        // AND
                 endcase
             end
 
@@ -113,8 +119,7 @@ module controlunit #(
                 case(funct3)
                     3'b000: MemType_o = 2'b01; // SB
                     3'b001: MemType_o = 2'b10; // SH
-                    3'b010: MemType_o = 2'b00; // SW
-                    default: MemType_o = 2'b00;
+                    default: MemType_o = 2'b00; // SW
                 endcase 
             end
 

@@ -42,7 +42,10 @@ module ALU #(
 
             // SRA (Shift Right Arithmetic)
             4'b1001: ALUResult_o = $signed(srcA_i) >>> srcB_i[SHIFT_WIDTH-1:0];
-        
+
+            // MUL (Multiplication)
+            4'b1010: ALUResult_o = srcA_i * srcB_i;
+            
             default: ALUResult_o = 32'd0;
         endcase
 

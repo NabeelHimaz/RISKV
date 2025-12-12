@@ -12,6 +12,7 @@ module pipereg_DE_1 #(
     input  logic [3:0] ALUCtrlD,
     input  logic [2:0] BranchCtrlD,
     input  logic [1:0] Op1SrcD,
+    input  logic       PredictTakenD,
 
     //  Data Inputs (from Decode)
     input  logic [DATA_WIDTH-1:0] RD1D, RD2D, PCD, ImmExtD, PCPlus4D,
@@ -23,6 +24,7 @@ module pipereg_DE_1 #(
     output logic [3:0] ALUCtrlE,
     output logic [2:0] BranchCtrlE,
     output logic [1:0] Op1SrcE,
+    output logic       PredictTakenE,
 
     //  Data Outputs (to Execute)
     output logic [DATA_WIDTH-1:0] RD1E, RD2E, PCE, ImmExtE, PCPlus4E,
@@ -31,15 +33,16 @@ module pipereg_DE_1 #(
 
     always_ff @(posedge clk) begin
         if (rst || clr) begin
-            // Control
-            RegWriteE  <= 1'b0;
-            MemWriteE <= 1'b0; JumpE    <= 1'b0;
-            BranchE    <= 1'b0; ALUSrcE   <= 1'b0;
+            // Control 
+            RegWriteE <= 1'b0; 
+            MemWriteE <= 1'b0; JumpE <= 1'b0;
+            BranchE <= 1'b0; ALUSrcE <= 1'b0;
             MemSignE <= 1'b0;
             ResultSrcE <= 2'b0; MemTypeE  <= 2'b0; ALUCtrlE <= 4'b0;
-            BranchCtrlE <= 3'b0;
-            Op1SrcE     <= 2'b00; // Reset
-            
+            BranchCtrlE <= 3'b0; 
+            Op1SrcE <= 2'b00; // Reset 
+            PredictTakenE <= 1'b0;
+
             // Data
             RD1E       <= {DATA_WIDTH{1'b0}};
             RD2E       <= {DATA_WIDTH{1'b0}};
@@ -58,6 +61,7 @@ module pipereg_DE_1 #(
             ResultSrcE <= ResultSrcD;MemTypeE  <= MemTypeD;  ALUCtrlE <= ALUCtrlD;
             BranchCtrlE <= BranchCtrlD;
             Op1SrcE     <= Op1SrcD; // Pass through
+            PredictTakenE <= PredictTakenD;
             
             RD1E       <= RD1D;
             RD2E       <= RD2D;
