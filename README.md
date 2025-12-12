@@ -77,10 +77,10 @@ sudo chmod +x pdf_test.sh
 ./pdf_test.sh
 ```
 
-Both `cpp` scripts can be found in `./tb/vbuddy_test`. The distribution for the pdf test can be changed by overwriting the distribution name in `./tb/vbuddy_test/pdf_tb.cpp` in line 13.
+The distribution for the pdf test can be changed by overwriting the distribution name in `./tb/verify.cpp` in line 43.
 ```cpp
 // can change to "noisy" or "triangle"
-const std::string distribution = "gaussian";
+setData("reference/gaussian.mem");;
 ```
 
 ## Team Members & Contributions
