@@ -497,13 +497,32 @@ We also ran the same `pdf` and `f1_fsm` tests on Vbuddy, and observed the simila
 ## Overview
 
 A simplified superscalar RISC-V processor that can execute two independent instructions simultaneously in a single clock cycle, achieving up to 2x throughput compared to a traditional scalar processor.
-## Design Simplifications
 
-- No hazard detection: Since it's non-pipelined, we assume independent instructions
-- No memory operations: Only arithmetic to avoid memory port conflicts
-- No branches
+### Implementation 
 
-Implementing only I/R type instructions greatly reduced the complexity. It removed the need for a data memory and meant only the ALU had to be duplicated.
+**Supported Instructions:**
+- R-type: ADD, SUB, AND, OR, XOR, SLL, SRL, SRA, SLT, SLTU
+- I-type ALU: ADDI, ANDI, ORI, XORI, SLLI, SRLI, SRAI, SLTI, SLTIU
+
+**Architectural Simplifications:**
+- No memory operations (loads/stores) - eliminates data memory and associated hazards
+- No branches or jumps - removes control hazard complexity
+- Simplified datapath focused on register-to-register operations
+
+### Design Benefits
+
+This reduced instruction set enabled:
+1. **Cleaner dual-issue logic** - both ALUs can operate independently without memory port conflicts
+2. **Simplified hazard detection** - only RAW (Read-After-Write) hazards between register operations
+3. **Streamlined dependency checking** - no load-use hazards or memory ordering concerns
+
+### Hardware Implementation
+
+Key components for dual-issue execution:
+- **Dual ALUs** - Two independent arithmetic/logic units for parallel computation
+- **Register File** - Four read ports (two per instruction) and two write ports
+- **Instruction Fetch** - Fetches two instructions per cycle
+- **Result Writeback** - Simultaneous writes to different destination registers
 
 # Appendix
 ### A. Design Philosophy & Decisions
