@@ -145,7 +145,6 @@ TEST_F(ControlUnitTestbench, Instruction_JAL)
     top->Instr_i = 0x0000006F; 
     tick();
 
-    // Verilog doesn't have PCSrc_o. ResultSrc 2 usually means PC+4
     EXPECT_EQ(top->ResultSrc_o, 2); 
     EXPECT_EQ(top->RegWrite_o, 1);  //save pc+4
     EXPECT_EQ(top->ImmSrc_o, 4);    //j-type
@@ -176,7 +175,7 @@ TEST_F(ControlUnitTestbench, Instruction_LUI)
     EXPECT_EQ(top->ImmSrc_o, 3);    //u-type
     EXPECT_EQ(top->ALUSrc_o, 1);
     
-    // In your Verilog, LUI sets Op1Src to 2 (Zero)
+    // LUI sets Op1Src to 2
     EXPECT_EQ(top->Op1Src_o, 2);   
 }
 
@@ -189,7 +188,7 @@ TEST_F(ControlUnitTestbench, Instruction_AUIPC)
     EXPECT_EQ(top->RegWrite_o, 1);
     EXPECT_EQ(top->ImmSrc_o, 3);    
     
-    // In your Verilog, AUIPC sets Op1Src to 1 (PC)
+    // AUIPC sets Op1Src to 1
     EXPECT_EQ(top->Op1Src_o, 1);   
 }
 
