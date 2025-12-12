@@ -46,37 +46,48 @@ git checkout <branch-name>
 #### Running Provided Test Suite
 
 ```bash
-cd ./tb
+cd tb
 ./doit.sh
 ```
 
-This will execute all five provided test cases (`1_addi_bne`, `2_li_add`, `3_lbu_sb`, `4_jal_ret`, `5_pdf`) and verify correct execution.
+You will be given the option to execute:
 
-The distribution for the pdf test can be changed by overwriting the distribution name in `./tb/verify.cpp` in line 43.
+- **Unit tests** (testbenches we have written to verify the logic of individual modules).
+- **Program tests** (verifies execution of test programs to ensure the processor meets requirements).
+- **Both** (to run all test files).
+
+The distribution for the pdf test can be changed by overwriting the distribution name.
+
+To do this in `./tb/program_tests/verify.cpp`, change line 43.
 ```cpp
-// can change to "noisy" or "triangle"
-setData("reference/gaussian.mem");;
+// can change to "noisy", "triangle", or "sine"
+setData("reference/gaussian.mem");
 ```
+
+To do this in `./tb/program_tests/execute_pdf.cpp`, change line 144.
+```cpp
+// can change to "noisy", "triangle", or "sine"
+tb.setData("reference/gaussian.mem");
+```
+The execute_pdf.cpp program also allows you to skip vbuddy clock cycle plotting to a specific target in order to save execution time. The suggested thresholds for each datasource are hardcoded in lines 18-22. Uncomment the appropriate line depending on your datasource.
 
 For unit testing each module, we run:
 ```bash
-cd ./tb
-./unit_test.sh
+cd tb
+./doit.sh unit_tests/<"test name">.cpp
 ```
-This will run all the individual unit tests. **Note: this can only be run in complete**
+This will run the individual unit tests.
 
 
 #### Quick Start - Vbuddy Tests
 
-##### **Windows only**: remember to include `~/Documents/iac/lab0-devtools/tools/attach_usb.sh` command to connect Vbuddy.
-
-**ARCHIT VERIFY THIS**
+##### **Windows only**: the doit.sh script automatically attempts to run the attach_usb.sh script on execution in order to pair to vbuddy if connected.
 
 To run the f1 light test within the `./tb/` folder,
 
 ```bash
-chmod +x f1_test.sh
-./f1_test.sh
+cd tb
+./doit.sh program_tests/execute_f1.cpp
 ```
 
 
