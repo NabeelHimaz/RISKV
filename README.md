@@ -87,10 +87,10 @@ chmod +x f1_test.sh
 
 | Team Member | GitHub | CID | Email | Personal Statement |
 |-------------|--------|-----|-------|-------------------|
-| [Team Member 1] | [@username1](https://github.com/username1) | [CID] | [email] | [Link to Statement](./statements/Member1.md) |
-| [Team Member 2] | [@username2](https://github.com/username2) | [CID] | [email] | [Link to Statement](./statements/Member2.md) |
-| [Team Member 3] | [@username3](https://github.com/username3) | [CID] | [email] | [Link to Statement](./statements/Member3.md) |
-| [Team Member 4] | [@username4](https://github.com/username4) | [CID] | [email] | [Link to Statement](./statements/Member4.md) |
+| [Team Member 1] | [@Asad-Tarq](https://github.com/Asad-Tarq) | [02582153] | [art24@ic.ac.uk] | [Link to Statement](./statements/Asad.md) |
+| [Team Member 2] | [@Marc0s-ikp](https://github.com/Marc0s-ikp) | [02415338] | [mi624@ic.ac.uk] | [Link to Statement](./statements/Marcus.md) |
+| [Team Member 3] | [@NabeelHimaz](https://github.com/NabeelHimaz) | [CID] | [nh1324@ic.ac.uk] | [Link to Statement](./statements/Nabeel.md) |
+| [Team Member 4] | [@archit-ku](https://github.com/archit-ku) | [02560961] | [archit.kumar24@imperial.ac.uk] | [Link to Statement](./statements/Archit.md) |
 
 
 ## Single-Cycle CPU Implementation
