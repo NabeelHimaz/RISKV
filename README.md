@@ -52,10 +52,18 @@ cd ./tb
 
 This will execute all five provided test cases (`1_addi_bne`, `2_li_add`, `3_lbu_sb`, `4_jal_ret`, `5_pdf`) and verify correct execution.
 
+The distribution for the pdf test can be changed by overwriting the distribution name in `./tb/verify.cpp` in line 43.
+```cpp
+// can change to "noisy" or "triangle"
+setData("reference/gaussian.mem");;
+```
 
-For unit testing each module...
-**ARCHIT FILL IN HERE**
-
+For unit testing each module, we run:
+```bash
+cd ./tb
+./unit_test.sh
+```
+This will run all the individual unit tests. **Note: this can only be run in complete**
 
 
 #### Quick Start - Vbuddy Tests
@@ -67,21 +75,11 @@ For unit testing each module...
 To run the f1 light test within the `./tb/` folder,
 
 ```bash
-sudo chmod +x f1_test.sh
+chmod +x f1_test.sh
 ./f1_test.sh
 ```
 
-To run the pdf test within the `./tb/` folder,
-```bash
-sudo chmod +x pdf_test.sh
-./pdf_test.sh
-```
 
-The distribution for the pdf test can be changed by overwriting the distribution name in `./tb/verify.cpp` in line 43.
-```cpp
-// can change to "noisy" or "triangle"
-setData("reference/gaussian.mem");;
-```
 
 ## Team Members & Contributions
 
