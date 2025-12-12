@@ -8,7 +8,7 @@ This document offers a detailed account of my work on the RISC-V project. It hig
 
 ## Overview of Contributions
 
-### [**Single Cycle Full RV32I**](#single-cycle-1)
+### [**Single Cycle Full RV32I**](#Single-Cycle-Full-RISCV-32I-Design)
 - PC Module
 - Instruction Memory
 - ALU
@@ -33,6 +33,8 @@ This document offers a detailed account of my work on the RISC-V project. It hig
     - Integrated cache module into single cycle
     - Modified top so that I could prove that cache was being hit
 
+### [**Branch Prediction**](#Branch-Prediction)
+- Contributed to adding a quick branch prediction into the complete pipelined register
 ---
 
 
@@ -282,8 +284,9 @@ The fetch stage is the entry point of the pipeline, responsible for supplying a 
 4. **PC Multiplexer** - selects between PC+4 and branch/jump target
 5. **Fetch/Decode Pipeline Register** - isolates fetch stage from decode stage
 
-
 ![Fetch Stage](../images/Fetch_Stage.png)
+
+This diagram illustrates the data flow below with PCSrcE being the input into the mux. To see the significance of influence of Flush/ Stall, look below to the Hazard Unit Integration. 
 
 **Data Flow:**
 ```
@@ -682,18 +685,29 @@ I modified top so that it would output a `cache_hit` signal, I traced this in wa
 
 This shows that cache is being hit meaning that theoretically it could be used in larger programs to speed up the CPU.   
 
-# What I learned
+# Branch Prediction 
+
+
+# What I learned:
  
 - **Spend more time planning**: While we made an initial schematic on paper to help us with how the components interacted, we didn't plan as much for subsequent stages which lead to some difficulties later on when we had to create new ports in certain modules. Stronger initial planning would have helped. 
 
-- **Abstraction is very useful**: Creating clean interfaces between modules (like data_mem_top encapsulating cache and main memory, or hazard unit operating independently) meant we could modify internal implementations without breaking the entire processor. When we integrated the cache, the CPU stages didn't need to change at all because we hid the complexity behind a simple memory interface. 
+- **Abstraction is critical in hardware**: Creating clean interfaces between modules (like data_mem_top encapsulating cache and main memory, or hazard unit operating independently) meant we could modify internal implementations without breaking the entire processor. When we integrated the cache, the CPU stages didn't need to change at all because we hid the complexity behind a simple memory interface. 
 
 - **Waveform debugging is essential**: GTKWave is useful to find bugs. Tracking signals through pipeline stages revealed bugs that would never show up in final outputs like PC+4 not propagating.
 
+# Further Improvements:
+
+If I had more time, I'd love to add further advancements to this project:
+
+**Branch Prediction:**
+Verify the basic branch predictio with targeted test programs 
 
 
+**Superscalar Execution:** Extend to a pipeline capable of executing multiple independent instructions per cycle. This would require logic to detect data dependencies between parallel instructions and multiple execution units (2 ALUs, separate load/store unit) to increase overall throughput. 
+
+We've already started basic forms of both of these already so I think each of these improvements would be quite feasible especially due to our modular structure
 
 ---
-
 
 
