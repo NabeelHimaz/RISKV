@@ -46,37 +46,48 @@ git checkout <branch-name>
 #### Running Provided Test Suite
 
 ```bash
-cd ./tb
+cd tb
 ./doit.sh
 ```
 
-This will execute all five provided test cases (`1_addi_bne`, `2_li_add`, `3_lbu_sb`, `4_jal_ret`, `5_pdf`) and verify correct execution.
+You will be given the option to execute:
 
-The distribution for the pdf test can be changed by overwriting the distribution name in `./tb/verify.cpp` in line 43.
+- **Unit tests** (testbenches we have written to verify the logic of individual modules).
+- **Program tests** (verifies execution of test programs to ensure the processor meets requirements).
+- **Both** (to run all test files).
+
+The distribution for the pdf test can be changed by overwriting the distribution name.
+
+To do this in `./tb/program_tests/verify.cpp`, change line 43.
 ```cpp
-// can change to "noisy" or "triangle"
-setData("reference/gaussian.mem");;
+// can change to "noisy", "triangle", or "sine"
+setData("reference/gaussian.mem");
 ```
+
+To do this in `./tb/program_tests/execute_pdf.cpp`, change line 144.
+```cpp
+// can change to "noisy", "triangle", or "sine"
+tb.setData("reference/gaussian.mem");
+```
+The execute_pdf.cpp program also allows you to skip vbuddy clock cycle plotting to a specific target in order to save execution time. The suggested thresholds for each datasource are hardcoded in lines 18-22. Uncomment the appropriate line depending on your datasource.
 
 For unit testing each module, we run:
 ```bash
-cd ./tb
-./unit_test.sh
+cd tb
+./doit.sh unit_tests/<"test name">.cpp
 ```
-This will run all the individual unit tests. **Note: this can only be run in complete**
+This will run the individual unit tests.
 
 
 #### Quick Start - Vbuddy Tests
 
-##### **Windows only**: remember to include `~/Documents/iac/lab0-devtools/tools/attach_usb.sh` command to connect Vbuddy.
-
-**ARCHIT VERIFY THIS**
+##### **Windows only**: the doit.sh script automatically attempts to run the attach_usb.sh script on execution in order to pair to vbuddy if connected.
 
 To run the f1 light test within the `./tb/` folder,
 
 ```bash
-chmod +x f1_test.sh
-./f1_test.sh
+cd tb
+./doit.sh program_tests/execute_f1.cpp
 ```
 
 
@@ -196,24 +207,19 @@ For the tests provided (`1_addi_bne` `2_li_add` `3_lbu_sb` `4_jal_ret` `5_pdf`):
 ![Single cycle testing](/images/single-cycle-tests.png)
 
 ### F1
-![Video for F1 lights](images/vbuddy_tests/F1.gif)
-
-[Link to Video](images/vbuddy_tests/F1_FSM.mp4)
+https://github.com/user-attachments/assets/d6e40790-56d4-4d95-b67c-37f45b6d86d5
 
 ### PDF: Gaussian
-![Video for PDF: Gaussian Test](images/vbuddy_tests/PDF-Gaussian.gif)
-
-[Link to Video (Higher quality)](images/vbuddy_tests/PDF-Gaussian.mp4)
+https://github.com/user-attachments/assets/78df51d1-e5ad-4024-bef0-96da9c50b70a
 
 ### PDF: Noisy
-![Video for PDF: Noisy test](images/vbuddy_tests/PDF-Noisy.gif)
-
-[Link to Video (Higher Quality)](images/vbuddy_tests/PDF-Noisy.mp4)
+https://github.com/user-attachments/assets/eef1a4e2-7991-4c1d-afa6-7ff94e41b589
 
 ### PDF: Triangle
-![Video for PDF: Triangle test](images/vbuddy_tests/PDF-Triangle.gif)
+https://github.com/user-attachments/assets/07633f81-343f-42c6-8fd5-e5dfc97a4d0a
 
-[Link to Video (Higher Quality)](/images/vbuddy_tests/PDF-Triangle.mp4)
+### PDF: Sine
+https://github.com/user-attachments/assets/fc73e31b-ed6a-421a-bb6c-efd21d2088e7
 
 ---
 # Pipelined RISC-V CPU
