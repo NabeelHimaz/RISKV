@@ -8,13 +8,13 @@ This document offers a detailed account of my work on the RISC-V project. It hig
 
 ## Overview of Contributions
 
-### [**Single Cycle Full RV32I**](#Single-Cycle-Full-RISCV-32I-Design)
-- PC Module
-- Instruction Memory
-- ALU
-- Extend
+### [Single Cycle Full RV32I](#single-cycle-full-risc-v-32i-design)
+- PC Module [commit](https://github.com/NabeelHimaz/RISCV-Team04/commit/d4e13ea856879a5bd7e5baffe6ba4b12e2aecf51)
+- ALU [commit](https://github.com/NabeelHimaz/RISCV-Team04/commit/b7c2fb1e352b3d2cacdd509283573ec3d542a427)
+- Extend [commit](https://github.com/NabeelHimaz/RISCV-Team04/commit/f1ad5d5646229df9329dedd7cd21a0e965b8fbe4)
 - Top Integration 
-### [**Pipelined + Full RV32I**](#pipelined--full-rv32i-1)
+
+### [Pipelined + Full RV32I](#pipelined-risc-v-32i-design)
 - Fetch Stage [commit](https://github.com/NabeelHimaz/RISCV-Team04/commit/d4e13ea856879a5bd7e5baffe6ba4b12e2aecf51)
 - Decode Stage [commit](https://github.com/NabeelHimaz/RISCV-Team04/commit/de7c98fae0cd8cdf3a7e50e4c379c5a57703501a)
 - Execute Stage [commit](https://github.com/NabeelHimaz/RISCV-Team04/commit/6da8eef32ce5f443c122d522cf2e9fe3673b3bcb)
@@ -28,13 +28,14 @@ This document offers a detailed account of my work on the RISC-V project. It hig
 - Helped integration, testing and debugging of pipelined processor
     - Integrate top level fetch, decode, execute, memory and write-back stages
 
-### [**Pipelined + Full RV32I + Cache**](#pipelined--full-rv32i--cache-1)
+### [Pipelined + Full RV32I + Cache](#cache-integration)
 - Integration, testing and debugging of pipelined + cached processor
     - Integrated cache module into single cycle
     - Modified top so that I could prove that cache was being hit
 
-### [**Branch Prediction**](#Branch-Prediction)
+### [Branch Prediction](#branch-prediction)
 - Contributed to adding a quick branch prediction into the complete pipelined register
+- Ran basic tests
 ---
 
 
@@ -696,12 +697,21 @@ This shows that cache is being hit meaning that theoretically it could be used i
 
 - **Waveform debugging is essential**: GTKWave is useful to find bugs. Tracking signals through pipeline stages revealed bugs that would never show up in final outputs like PC+4 not propagating.
 
+# Branch Prediction
+
+I was able to do a little testing for the simple branch prediction we had implemented:
+
+![Branch-Prediction Testing](../images/Branch_Prediction_Testing.png)
+
+Unfortunately, due to the limited time, we couldn't verify it further than the required tests. 
+
+
 # Further Improvements:
 
 If I had more time, I'd love to add further advancements to this project:
 
 **Branch Prediction:**
-Verify the basic branch predictio with targeted test programs 
+Verify the basic branch prediction with targeted test programs 
 
 
 **Superscalar Execution:** Extend to a pipeline capable of executing multiple independent instructions per cycle. This would require logic to detect data dependencies between parallel instructions and multiple execution units (2 ALUs, separate load/store unit) to increase overall throughput. 
